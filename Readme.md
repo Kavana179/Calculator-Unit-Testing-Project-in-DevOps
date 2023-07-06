@@ -1,5 +1,3 @@
-Sure, here's the full documentation for the `my_calculator` project:
-
 ## Example Calculator Unit Testing Project in DevOps
 The `my_calculator` project is a simple calculator application written in Python that includes unit tests to ensure that the application functions correctly. The project includes a `calculator.py` file that defines a `Calculator` class with methods for addition, subtraction, multiplication, and division. It also includes separate test files for each of these methods in the `tests` directory.
 
