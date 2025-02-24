@@ -51,9 +51,13 @@ jobs:
           echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
           source $GITHUB_ENV  # Reload environment variables
 
+          # Ensure the sonar-scanner binary is executable
+          chmod +x $PWD/sonar-scanner/bin/sonar-scanner
+
           # Verify sonar-scanner installation and PATH
           echo "PATH: $PATH"  # Log the PATH variable
           which sonar-scanner  # Check if sonar-scanner is available
+          ls -l $PWD/sonar-scanner/bin/sonar-scanner  # List permissions for sonar-scanner binary
 
       # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
