@@ -44,12 +44,22 @@ jobs:
           # Unzip the downloaded file
           unzip 7.0.2.4839.zip
 
+          # Log the directory structure after extraction
+          echo "Directory structure after extraction:"
+          ls -R sonar-scanner-cli-7.0.2.4839  # List the full directory structure
+
           mv sonar-scanner-cli-7.0.2.4839 sonar-scanner
+
+          # Log the path of sonar-scanner directory
+          echo "SonarScanner directory path: $PWD/sonar-scanner"
 
           # Add SonarScanner to PATH and export it so that it is available in the current shell session
           echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
           echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
           source $GITHUB_ENV  # Reload environment variables
+
+          # Check if sonar-scanner binary exists
+          ls -l $PWD/sonar-scanner/bin/sonar-scanner  # List sonar-scanner binary location and permissions
 
           # Ensure the sonar-scanner binary is executable
           chmod +x $PWD/sonar-scanner/bin/sonar-scanner
@@ -57,7 +67,6 @@ jobs:
           # Verify sonar-scanner installation and PATH
           echo "PATH: $PATH"  # Log the PATH variable
           which sonar-scanner  # Check if sonar-scanner is available
-          ls -l $PWD/sonar-scanner/bin/sonar-scanner  # List permissions for sonar-scanner binary
 
       # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
@@ -66,12 +75,11 @@ jobs:
           coverage run -m pytest
           coverage xml  # Generates the coverage.xml file
 
-      # Step 7: Run SonarCloud analysis with verbose output
+      # Step 7: Run SonarCloud analysis
       - name: Run SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Reference the token from GitHub secrets
         run: |
-          echo "Starting SonarScanner analysis"
           sonar-scanner -X \
             -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
             -Dsonar.organization=kavana179 \
@@ -79,5 +87,6 @@ jobs:
             -Dsonar.language=python  # Specify the language as Python
             -Dsonar.python.version=3.9  # Specify the exact Python version
             -Dsonar.python.coverage.reportPaths=coverage.xml  # Point to the generated coverage report
+
 
 
