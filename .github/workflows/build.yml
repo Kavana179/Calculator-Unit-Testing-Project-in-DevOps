@@ -33,19 +33,11 @@ jobs:
           pip install pytest
           pip install coverage  # Install coverage to generate coverage reports
 
-      # Step 5: Download and Install SonarScanner
-      - name: Install SonarScanner
+      # Step 5: Install SonarScanner
+      - name: Install SonarScanner using apt-get
         run: |
-          # Download the latest version of SonarScanner
-          wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/7.0.2.4839/sonar-scanner-cli-7.0.2.4839-linux.zip
-          
-          # Unzip the downloaded file
-          unzip sonar-scanner-cli-7.0.2.4839-linux.zip
-          
-          # Add SonarScanner to PATH
-          export PATH=$PWD/sonar-scanner-7.0.2.4839-linux/bin:$PATH
-          echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner-7.0.2.4839-linux" >> $GITHUB_ENV
-          echo "PATH=$PATH" >> $GITHUB_ENV
+          sudo apt-get update
+          sudo apt-get install -y sonar-scanner
 
       # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
