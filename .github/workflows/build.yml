@@ -36,17 +36,18 @@ jobs:
       # Step 5: Download and Install SonarScanner
       - name: Install SonarScanner
         run: |
-          # Download SonarScanner
-          wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/4.7.0.2747/sonar-scanner-cli-4.7.0.2747-linux.zip
+          # Download SonarScanner (update the URL with a valid one)
+          wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/4.7.0.2747/sonar-scanner-cli-4.7.0.2747-linux.zip || \
+          wget https://github.com/SonarSource/sonar-scanner-cli/releases/latest/download/sonar-scanner-cli-linux.zip
           
           # Unzip the downloaded file
-          unzip sonar-scanner-cli-4.7.0.2747-linux.zip
+          unzip sonar-scanner-cli-4.7.0.2747-linux.zip || unzip sonar-scanner-cli-linux.zip
           
           # Add SonarScanner to PATH
-          export PATH=$PWD/sonar-scanner-4.7.0.2747-linux/bin:$PATH
+          export PATH=$PWD/sonar-scanner-*/bin:$PATH
           
           # Persist SonarScanner binary path in the environment for future steps
-          echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner-4.7.0.2747-linux" >> $GITHUB_ENV
+          echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner-*/" >> $GITHUB_ENV
           echo "PATH=$PATH" >> $GITHUB_ENV
 
       # Step 6: Run tests and generate coverage report
