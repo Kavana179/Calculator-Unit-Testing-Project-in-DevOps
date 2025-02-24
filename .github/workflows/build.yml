@@ -66,16 +66,18 @@ jobs:
           coverage run -m pytest
           coverage xml  # Generates the coverage.xml file
 
-      # Step 7: Run SonarCloud analysis
+      # Step 7: Run SonarCloud analysis with verbose output
       - name: Run SonarCloud analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Reference the token from GitHub secrets
         run: |
-          sonar-scanner \
+          echo "Starting SonarScanner analysis"
+          sonar-scanner -X \
             -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
             -Dsonar.organization=kavana179 \
             -Dsonar.sources=.  # Root directory as the source
             -Dsonar.language=python  # Specify the language as Python
             -Dsonar.python.version=3.9  # Specify the exact Python version
             -Dsonar.python.coverage.reportPaths=coverage.xml  # Point to the generated coverage report
+
 
