@@ -1,0 +1,50 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    name: Build and Analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout code from GitHub
+      - uses: actions/checkout@v4
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9  # Use the correct Python version here
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install coverage  # Install coverage to generate coverage reports
+          
+      # Step 4: Run tests and generate coverage report
+      - name: Run tests and generate coverage report
+        run: |
+          pytest --maxfail=1 --disable-warnings -q
+          coverage run -m pytest
+          coverage xml  # Generates the coverage.xml file
+
+      # Step 5: Run SonarCloud analysis
+      - name: Run SonarCloud analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Reference the token from GitHub secrets
+        run: |
+          sonar-scanner \
+            -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
+            -Dsonar.organization=kavana179 \
+            -Dsonar.sources=calculator.py  # Ensure this points to your source directory (e.g., `src`, `.`)
+            -Dsonar.language=python  # Ensure this is set to python
+            -Dsonar.python.version=3.9  # Specify the exact Python version
+            -Dsonar.python.coverage.reportPaths=coverage.xml  # Point to the generated coverage report
