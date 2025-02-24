@@ -43,6 +43,9 @@ jobs:
           unzip 7.0.2.4839.zip
 
           mv sonar-scanner-cli-7.0.2.4839 sonar-scanner
+
+          ls -alh sonar-scanner
+          
           
           # Add SonarScanner to PATH
           export PATH=$PWD/sonar-scanner/bin:$PATH
@@ -50,6 +53,8 @@ jobs:
           # Persist SonarScanner binary path in the environment for future steps
           echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
           echo "PATH=$PATH" >> $GITHUB_ENV
+
+          sonar-scanner --version
 
       # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
