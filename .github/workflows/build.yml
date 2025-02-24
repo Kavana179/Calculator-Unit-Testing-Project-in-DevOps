@@ -47,18 +47,13 @@ jobs:
 
           mv sonar-scanner-cli-7.0.2.4839 sonar-scanner
 
-          # List the contents of the directory to confirm sonar-scanner is extracted
-          ls -alh sonar-scanner
-          
-          # Make sure the sonar-scanner is executable
-          chmod +x sonar-scanner/bin/sonar-scanner
+         
 
           # Add SonarScanner to PATH
           echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
           echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
 
-          # Verify sonar-scanner is executable
-          sonar-scanner --version
+        
 
       # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
