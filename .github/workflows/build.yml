@@ -6,6 +6,7 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   build:
     name: Build and Analyze
@@ -42,7 +43,7 @@ jobs:
           wget https://github.com/SonarSource/sonar-scanner-cli/archive/refs/tags/7.0.2.4839.zip
 
           # Unzip the downloaded file
-          unzip 7.0.2.4839.zip
+          unzip sonar-scanner-cli-7.0.2.4839.zip
 
           # Log the directory structure after extraction
           echo "Directory structure after extraction:"
@@ -87,6 +88,3 @@ jobs:
             -Dsonar.language=python  # Specify the language as Python
             -Dsonar.python.version=3.9  # Specify the exact Python version
             -Dsonar.python.coverage.reportPaths=coverage.xml  # Point to the generated coverage report
-
-
-
