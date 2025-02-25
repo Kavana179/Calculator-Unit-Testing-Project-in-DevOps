@@ -36,38 +36,42 @@ jobs:
       # Step 5: Install unzip and SonarScanner
       - name: Install unzip and SonarScanner
         run: |
-          # Install unzip (if it's not installed)
-          sudo apt-get install -y unzip
-          
-          # Download SonarScanner
-          wget https://github.com/SonarSource/sonar-scanner-cli/archive/refs/tags/7.0.2.4839.zip
+           # Install unzip (if it's not installed)
+           sudo apt-get install -y unzip
+    
+           # Download SonarScanner
+           wget https://github.com/SonarSource/sonar-scanner-cli/archive/refs/tags/7.0.2.4839.zip
+    
+           # Check if the file exists before trying to unzip it
+           ls -l 7.0.2.4839.zip  # List the file to confirm it exists
+    
+           # Unzip the downloaded file
+           unzip 7.0.2.4839.zip
+    
+           # Log the directory structure after extraction
+           echo "Directory structure after extraction:"
+           ls -R sonar-scanner-cli-7.0.2.4839  # List the full directory structure
 
-          # Unzip the downloaded file
-          unzip sonar-scanner-cli-7.0.2.4839.zip
+           mv sonar-scanner-cli-7.0.2.4839 sonar-scanner
 
-          # Log the directory structure after extraction
-          echo "Directory structure after extraction:"
-          ls -R sonar-scanner-cli-7.0.2.4839  # List the full directory structure
+           # Log the path of sonar-scanner directory
+           echo "SonarScanner directory path: $PWD/sonar-scanner"
 
-          mv sonar-scanner-cli-7.0.2.4839 sonar-scanner
+           # Add SonarScanner to PATH and export it so that it is available in the current shell session
+           echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
+           echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
+           source $GITHUB_ENV  # Reload environment variables
 
-          # Log the path of sonar-scanner directory
-          echo "SonarScanner directory path: $PWD/sonar-scanner"
+           # Check if sonar-scanner binary exists
+           ls -l $PWD/sonar-scanner/bin/sonar-scanner  # List sonar-scanner binary location and permissions
 
-          # Add SonarScanner to PATH and export it so that it is available in the current shell session
-          echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
-          echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
-          source $GITHUB_ENV  # Reload environment variables
+           # Ensure the sonar-scanner binary is executable
+           chmod +x $PWD/sonar-scanner/bin/sonar-scanner
 
-          # Check if sonar-scanner binary exists
-          ls -l $PWD/sonar-scanner/bin/sonar-scanner  # List sonar-scanner binary location and permissions
+           # Verify sonar-scanner installation and PATH
+           echo "PATH: $PATH"  # Log the PATH variable
+           which sonar-scanner  # Check if sonar-scanner is available
 
-          # Ensure the sonar-scanner binary is executable
-          chmod +x $PWD/sonar-scanner/bin/sonar-scanner
-
-          # Verify sonar-scanner installation and PATH
-          echo "PATH: $PATH"  # Log the PATH variable
-          which sonar-scanner  # Check if sonar-scanner is available
 
       # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
