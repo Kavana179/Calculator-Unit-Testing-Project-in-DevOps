@@ -21,34 +21,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y unzip wget openjdk-11-jdk jq
 
-      # Fetch and install SonarScanner
-      - name: Install SonarScanner
-        run: |
-          # Hardcode the SonarScanner version (change to a valid version)
-          LATEST_VERSION="4.6.2.2472"
-
-          # Debug: Print the version
-          echo "SonarScanner version: $LATEST_VERSION"
-
-          # Download SonarScanner (adjust the URL for the correct version)
-          wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/${LATEST_VERSION}/sonar-scanner-cli-${LATEST_VERSION}-linux.zip
-
-          # Unzip the downloaded file
-          unzip sonar-scanner-cli-${LATEST_VERSION}-linux.zip
-
-          # Move the extracted folder
-          mv sonar-scanner-cli-${LATEST_VERSION}-linux sonar-scanner
-
-          # Set environment variables for SonarScanner
-          echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
-          echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
-
-          # Ensure SonarScanner is executable
-          chmod +x $PWD/sonar-scanner/bin/sonar-scanner
-
-          # Verify installation
-          sonar-scanner -v
-
       # Run tests and generate coverage report
       - name: Run tests and generate coverage report
         run: |
@@ -56,15 +28,16 @@ jobs:
           coverage run -m pytest
           coverage xml
 
-      # Run SonarCloud analysis
-      - name: Run SonarCloud analysis
+      # Run SonarCloud analysis using the SonarCloud GitHub Action
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v1.5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          sonar-scanner -X \
-            -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
-            -Dsonar.organization=kavana179 \
-            -Dsonar.sources=. \
-            -Dsonar.language=python \
-            -Dsonar.python.version=3.9 \
+        with:
+          args: >
+            -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
+            -Dsonar.organization=kavana179
+            -Dsonar.sources=.
+            -Dsonar.language=python
+            -Dsonar.python.version=3.9
             -Dsonar.python.coverage.reportPaths=coverage.xml
