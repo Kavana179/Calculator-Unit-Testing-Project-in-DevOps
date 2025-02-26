@@ -28,28 +28,12 @@ jobs:
 
     - name: Run tests and generate coverage report
       run: |
-        pytest --cov=calculator --cov-report=xml:coverage.xml  # 'calculator' is your module
-
-    - name: Install OpenJDK 17
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y openjdk-17-jdk
-
-    - name: Set JAVA_HOME to OpenJDK 17
-      run: |
-        echo "JAVA_HOME=/opt/openjdk-17" >> $GITHUB_ENV
-        echo "JAVA_HOME=$JAVA_HOME"
-        java -version  # Verify Java version in the environment
-
-    # Debug Java Home in Docker Container
-    - name: Debug Java Home in Docker Container
-      run: |
-        docker run --rm --entrypoint sh openjdk:17-jdk-alpine -c "echo \$JAVA_HOME && java -version"
+        pytest --cov=calculator --cov-report=xml:coverage.xml  # Replace 'calculator' with your module
 
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
       with:
-        entryPoint: /opt/sonar-scanner/bin/sonar-scanner 
+        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  # Make sure the sonar-scanner path is correct
         args: >
           -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
           -Dsonar.organization=kavana179
@@ -57,8 +41,7 @@ jobs:
           -Dsonar.python.version=3.9
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.language=python
-          -Dsonar.host.url=https://sonarcloud.io  # Set the SonarCloud URL
-          -Dsonar.java.home=$JAVA_HOME  # Ensure JAVA_HOME is set for SonarCloud analysis
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.verbose=true  # Enable verbose logging for debugging
       env:
-        JAVA_HOME: ${{ env.JAVA_HOME }}  # Explicitly pass JAVA_HOME into the SonarCloud container
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Ensure to set your SonarCloud token securely
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Make sure to set your SonarCloud token securely
