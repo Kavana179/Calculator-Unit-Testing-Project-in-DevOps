@@ -33,15 +33,12 @@ jobs:
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
       with:
-        entryPoint: /opt/sonar-scanner/bin/sonar-scanner   
+        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  # Default SonarScanner entry point in the Docker container
         args: >
-          -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps  
-          -Dsonar.organization=kavana179  
-          -Dsonar.sources=.  
-          -Dsonar.python.version=3.9  
-          -Dsonar.python.coverage.reportPaths=coverage.xml  
-          -Dsonar.language=python  
-
-    - name: Run SonarCloud analysis
-      run: |
-        echo "Running SonarCloud analysis"
+          -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
+          -Dsonar.organization=kavana179
+          -Dsonar.sources=.
+          -Dsonar.python.version=3.9
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.language=python
+          -Dsonar.host.url=https://sonarcloud.io  
