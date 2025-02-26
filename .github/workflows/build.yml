@@ -37,9 +37,13 @@ jobs:
 
     - name: Set JAVA_HOME to OpenJDK 17
       run: |
-        echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+        echo "JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64" >> $GITHUB_ENV
         echo "JAVA_HOME=$JAVA_HOME"
         java -version  # Verify Java version in the environment
+
+    - name: Debug Java Location Inside Docker
+      run: |
+        docker run --rm --entrypoint java alpine -version  # Check Java version inside a minimal Docker container
 
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
@@ -53,4 +57,6 @@ jobs:
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.language=python
           -Dsonar.host.url=https://sonarcloud.io  
-          -Dsonar.java.home=$JAVA_HOME  # Use the JAVA_HOME environment variable
+          -Dsonar.java.home=$JAVA_HOME  
+      env:
+        JAVA_HOME: ${{ env.JAVA_HOME }}  
