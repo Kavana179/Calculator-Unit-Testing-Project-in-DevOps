@@ -5,13 +5,6 @@ on:
     branches:
       - main
   pull_request:
-    branches:name: SonarCloud Analysis
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
 
@@ -41,49 +34,10 @@ jobs:
       run: |
         which sonar-scanner  
         sonar-scanner -v     
-    - name: Set up SonarCloud scanner
-      uses: SonarSource/sonarcloud-github-action@v1.5
-      with:
-        args: >
-          -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
-          -Dsonar.organization=kavana179
-          -Dsonar.sources=.
-          -Dsonar.python.version=3.9
-          -Dsonar.python.coverage.reportPaths=coverage.xml
-          -Dsonar.language=python
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.verbose=true  
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
-
-      - main
-
-jobs:
-  sonarcloud:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest pytest-cov  # Make sure to install pytest-cov plugin
-
-    - name: Run tests and generate coverage report
-      run: |
-        pytest --cov=calculator --cov-report=xml:coverage.xml  # Replace 'calculator' with your module
 
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
       with:
-        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  
         args: >
           -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
           -Dsonar.organization=kavana179
