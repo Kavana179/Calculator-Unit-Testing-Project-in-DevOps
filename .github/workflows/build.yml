@@ -33,7 +33,7 @@ jobs:
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
       with:
-        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  # Make sure the sonar-scanner path is correct
+        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  
         args: >
           -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
           -Dsonar.organization=kavana179
@@ -44,4 +44,4 @@ jobs:
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.verbose=true  # Enable verbose logging for debugging
       env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Make sure to set your SonarCloud token securely
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
