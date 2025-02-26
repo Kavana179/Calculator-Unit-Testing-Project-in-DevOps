@@ -30,20 +30,28 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest pytest-cov
 
-      # Set up JDK 17 for SonarCloud
+      # Set up JDK 17 using Temurin (formerly AdoptOpenJDK)
       - name: Set up JDK 17
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'temurin'  # Java distribution, can also be 'temurin', 'zulu', etc.
+          distribution: 'temurin'  # Use 'temurin' instead of 'adoptopenjdk'
           java-package: jdk
           architecture: x64
           check-latest: false
 
-      # Run tests with coverage using pytest and pytest-cov
-      - name: Run tests with coverage
+      # Verify Java installation
+      - name: Verify Java installation
         run: |
-          pytest --maxfail=1 --disable-warnings -q --cov=your_module --cov-report=xml:coverage.xml
+          echo $JAVA_HOME
+          java -version
+
+      # Run tests with coverage using pytest and pytest-cov
+      - name: Run tests and generate coverage report
+        run: |
+          pytest tests/ --maxfail=1 --disable-warnings -q  # Run tests in the 'tests' directory
+          coverage run -m pytest
+          coverage xml  # Generates the coverage.xml file
 
       # Set up SonarCloud
       - name: SonarCloud Setup
@@ -60,6 +68,8 @@ jobs:
             -Dsonar.verbose=true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
+          PATH: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64/bin:$PATH
           
       # Optionally, if you need to see verbose output for debugging
       - name: Check SonarScanner location
