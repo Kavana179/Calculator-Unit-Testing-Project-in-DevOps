@@ -44,7 +44,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Ensure the token is set in GitHub secrets
         with:
           args: |
-            -X  # Enable full debug logging for SonarScanner
+            -X  
             -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
             -Dsonar.organization=kavana179
             -Dsonar.sources=.
