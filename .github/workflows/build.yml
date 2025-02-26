@@ -3,9 +3,9 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to 'main' branch
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]  # Trigger on PR events
 
 jobs:
   build:
@@ -16,79 +16,64 @@ jobs:
       # Step 1: Checkout code from GitHub
       - uses: actions/checkout@v4
 
-      # Step 2: Set Python path (ensure that the root directory is included in the Python path)
+      # Step 2: Set Python environment variables
       - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV  # Add root directory to the path
+        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV  # Add root directory to PYTHONPATH
 
       # Step 3: Set up Python environment
-      - name: Set up Python
+      - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
-          python-version: 3.9  # Use the correct Python version here
+          python-version: 3.9  # Use the correct Python version
 
       # Step 4: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pytest
-          pip install coverage  # Install coverage to generate coverage reports
+          pip install coverage  # Install coverage for code coverage reports
 
-      # Step 5: Install unzip and SonarScanner
-      - name: Install unzip and SonarScanner
+      # Step 5: Install SonarScanner
+      - name: Install SonarScanner
         run: |
-           # Install unzip (if it's not installed)
-           sudo apt-get install -y unzip
+          # Install unzip (if not already installed)
+          sudo apt-get install -y unzip
     
-           # Download SonarScanner
-           wget https://github.com/SonarSource/sonar-scanner-cli/archive/refs/tags/7.0.2.4839.zip
+          # Download SonarScanner CLI package
+          wget https://github.com/SonarSource/sonar-scanner-cli/archive/refs/tags/7.0.2.4839.zip
     
-           # Check if the file exists before trying to unzip it
-           ls -l 7.0.2.4839.zip  # List the file to confirm it exists
+          # Extract SonarScanner package
+          unzip 7.0.2.4839.zip
     
-           # Unzip the downloaded file
-           unzip 7.0.2.4839.zip
+          # Rename extracted folder to 'sonar-scanner'
+          mv sonar-scanner-cli-7.0.2.4839 sonar-scanner
     
-           # Log the directory structure after extraction
-           echo "Directory structure after extraction:"
-           ls -R sonar-scanner-cli-7.0.2.4839  # List the full directory structure
+          # Set the SONAR_SCANNER_HOME and update PATH
+          echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
+          echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
 
-           mv sonar-scanner-cli-7.0.2.4839 sonar-scanner
+          # Reload environment variables
+          source $GITHUB_ENV
 
-           # Log the path of sonar-scanner directory
-           echo "SonarScanner directory path: $PWD/sonar-scanner"
-
-           # Add SonarScanner to PATH and export it so that it is available in the current shell session
-           echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
-           echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
-           source $GITHUB_ENV  # Reload environment variables
-
-           # Check if sonar-scanner binary exists
-           ls -l $PWD/sonar-scanner/bin/sonar-scanner  # List sonar-scanner binary location and permissions
-
-           # Ensure the sonar-scanner binary is executable
-           chmod +x $PWD/sonar-scanner/bin/sonar-scanner
-
-           # Verify sonar-scanner installation and PATH
-           echo "PATH: $PATH"  # Log the PATH variable
-           which sonar-scanner  # Check if sonar-scanner is available
-
+          # Ensure sonar-scanner is executable
+          chmod +x $PWD/sonar-scanner/bin/sonar-scanner
 
       # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
         run: |
           pytest tests/ --maxfail=1 --disable-warnings -q  # Run tests in the 'tests' directory
           coverage run -m pytest
-          coverage xml  # Generates the coverage.xml file
+          coverage xml  # Generates coverage.xml file for SonarCloud
 
       # Step 7: Run SonarCloud analysis
       - name: Run SonarCloud analysis
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Reference the token from GitHub secrets
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Reference token from GitHub secrets
         run: |
           sonar-scanner -X \
             -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
             -Dsonar.organization=kavana179 \
-            -Dsonar.sources=.  # Root directory as the source
-            -Dsonar.language=python  # Specify the language as Python
-            -Dsonar.python.version=3.9  # Specify the exact Python version
-            -Dsonar.python.coverage.reportPaths=coverage.xml  # Point to the generated coverage report
+            -Dsonar.sources=.  # Set source directory to the root of the repository
+            -Dsonar.language=python  # Set language to Python
+            -Dsonar.python.version=3.9  # Use the Python version 3.9
+            -Dsonar.python.coverage.reportPaths=coverage.xml  # Path to the generated coverage report
