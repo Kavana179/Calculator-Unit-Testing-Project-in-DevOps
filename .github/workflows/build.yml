@@ -50,3 +50,4 @@ jobs:
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.language=python
           -Dsonar.host.url=https://sonarcloud.io  
+          -Dsonar.java.home=/usr/lib/jvm/java-17-openjdk-amd64  
