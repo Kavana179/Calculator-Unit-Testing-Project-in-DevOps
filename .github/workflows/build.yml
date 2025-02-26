@@ -24,13 +24,13 @@ jobs:
       # Fetch and install SonarScanner
       - name: Install SonarScanner
         run: |
-          # Fetch the latest SonarScanner release version
-          LATEST_VERSION=$(curl -s https://api.github.com/repos/SonarSource/sonar-scanner-cli/releases/latest | jq -r .tag_name)
+          # Hardcode the SonarScanner version (change to a valid version)
+          LATEST_VERSION="4.6.2.2472"
 
-          # Debug: Print the fetched version
+          # Debug: Print the version
           echo "SonarScanner version: $LATEST_VERSION"
 
-          # Download SonarScanner
+          # Download SonarScanner (adjust the URL for the correct version)
           wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/${LATEST_VERSION}/sonar-scanner-cli-${LATEST_VERSION}-linux.zip
 
           # Unzip the downloaded file
