@@ -3,9 +3,9 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - main  # Trigger on push to 'main' branch
+      - main
   pull_request:
-    types: [opened, synchronize, reopened]  # Trigger on PR events
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y unzip wget openjdk-11-jdk jq  # Include jq for parsing
+          sudo apt-get install -y unzip wget openjdk-11-jdk jq
 
       # Fetch and install SonarScanner
       - name: Install SonarScanner
