@@ -43,7 +43,8 @@ jobs:
     # Debug Java Home in Docker Container
     - name: Debug Java Home in Docker Container
       run: |
-        docker run --rm --entrypoint bash openjdk:17-jdk-alpine -c "echo $JAVA_HOME && java -version"
+        docker run --rm --entrypoint sh openjdk:17-jdk-alpine -c "echo $JAVA_HOME && java -version"
+
 
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
