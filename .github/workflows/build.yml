@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'adoptopenjdk'  # Java distribution, can also be 'temurin', 'zulu', etc.
+          distribution: 'temurin'  # Java distribution, can also be 'temurin', 'zulu', etc.
           java-package: jdk
           architecture: x64
           check-latest: false
