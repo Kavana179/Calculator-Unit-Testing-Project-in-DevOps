@@ -30,10 +30,15 @@ jobs:
       run: |
         pytest --cov=calculator --cov-report=xml:coverage.xml  # 'calculator' is your module
 
+    - name: Install OpenJDK 17
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-17-jdk
+
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
       with:
-        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  # Default SonarScanner entry point in the Docker container
+        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  
         args: >
           -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
           -Dsonar.organization=kavana179
