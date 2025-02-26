@@ -22,26 +22,32 @@ jobs:
         with:
           python-version: 3.9
 
-      # Step 3: Install OpenJDK 17 (required for SonarScanner)
+      # Step 3: Install OpenJDK 17
       - name: Install OpenJDK 17
         run: |
           sudo apt-get update
           sudo apt-get install -y openjdk-17-jdk
 
-      # Step 4: Install other dependencies
+      # Step 4: Set Java 17 as JAVA_HOME
+      - name: Set Java 17 as JAVA_HOME
+        run: |
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+          java -version  # Verify the correct version is being used
+
+      # Step 5: Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install pytest coverage
 
-      # Step 5: Run tests and generate coverage report
+      # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
         run: |
           pytest tests/
           coverage run -m pytest
           coverage xml
 
-      # Step 6: Run SonarCloud analysis with debug logging enabled
+      # Step 7: Run SonarCloud analysis with debug logging enabled
       - name: SonarCloud Scan with Debug Logging
         uses: SonarSource/sonarcloud-github-action@v1.5
         env:
