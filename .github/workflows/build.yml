@@ -3,9 +3,9 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on push to 'main' branch
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened]  # Trigger on PR events
 
 jobs:
   build:
@@ -13,15 +13,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the code from the repository
       - uses: actions/checkout@v4
 
-      # Set up Python
+      # Step 2: Set up Python 3.9
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
 
-      # Install necessary dependencies (pytest and coverage)
+      # Step 3: Install necessary dependencies (pytest, coverage, OpenJDK)
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -29,20 +30,20 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install pytest coverage
 
-      # Run tests and generate coverage report
+      # Step 4: Run tests and generate coverage report
       - name: Run tests and generate coverage report
         run: |
           pytest tests/
           coverage run -m pytest
           coverage xml
 
-      # Run SonarCloud analysis using the SonarCloud GitHub Action with debug enabled
+      # Step 5: Run SonarCloud analysis with debug logging enabled
       - name: SonarCloud Scan with Debug Logging
         uses: SonarSource/sonarcloud-github-action@v1.5
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Ensure the token is set in GitHub secrets
         with:
-          args: >
+          args: |
             -X  # Enable full debug logging for SonarScanner
             -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
             -Dsonar.organization=kavana179
