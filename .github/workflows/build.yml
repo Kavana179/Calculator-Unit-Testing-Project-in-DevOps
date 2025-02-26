@@ -12,29 +12,36 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # Step to check out your code
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Step to set up Python environment
+      # Set up Python
       - name: Set up Python 3.x
         uses: actions/setup-python@v2
         with:
           python-version: '3.9'
 
-      # Step to install dependencies (if you have requirements.txt)
+      # Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov
+          pip install -r requirements.txt
 
-      # Step to run tests and generate coverage report
+      # Run tests with coverage
       - name: Run tests with coverage
         run: |
           pytest --maxfail=1 --disable-warnings -q --cov=calculator --cov-report=xml:coverage.xml
 
-      # Step to upload to SonarCloud (this step includes sonar-scanner)
-      - name: SonarCloud Scan
+      # Set up Java 17 for SonarScanner
+      - name: Set up Java 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'temurin'  # You can specify 'temurin' (AdoptOpenJDK) or another distribution
+
+      # Run SonarCloud Analysis
+      - name: SonarCloud Analysis
         uses: SonarSource/sonarcloud-github-action@v1.5
         with:
           args: |
