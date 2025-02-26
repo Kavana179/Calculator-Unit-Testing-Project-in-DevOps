@@ -33,24 +33,34 @@ jobs:
           pip install pytest
           pip install coverage  # Install coverage for code coverage reports
 
-      # Step 5: Install SonarScanner
       - name: Install SonarScanner
         run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip wget openjdk-11-jdk  # Install unzip, wget, and OpenJDK
+         sudo apt-get update
+         sudo apt-get install -y unzip wget openjdk-11-jdk  # Install unzip, wget, and OpenJDK
 
-          SONAR_SCANNER_VERSION="4.6.2.2472"  # Adjust the version if needed
-          wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/sonar-scanner-${SONAR_SCANNER_VERSION}/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
+         # Fetch the latest SonarScanner release version
+         LATEST_VERSION=$(curl -s https://api.github.com/repos/SonarSource/sonar-scanner-cli/releases/latest | jq -r .tag_name)
 
-          unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
-          mv sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux sonar-scanner
+         # Download SonarScanner using the latest release version
+         wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/${LATEST_VERSION}/sonar-scanner-cli-${LATEST_VERSION}-linux.zip
 
-          echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
-          echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
-          source $GITHUB_ENV
+         # Extract the downloaded file
+         unzip sonar-scanner-cli-${LATEST_VERSION}-linux.zip
 
-          chmod +x $PWD/sonar-scanner/bin/sonar-scanner
-          sonar-scanner -v  # Verify sonar-scanner installation
+         # Move to a folder named sonar-scanner
+         mv sonar-scanner-cli-${LATEST_VERSION}-linux sonar-scanner
+
+         # Set environment variables for SonarScanner
+         echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
+         echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
+         source $GITHUB_ENV
+
+         # Ensure SonarScanner is executable
+         chmod +x $PWD/sonar-scanner/bin/sonar-scanner
+
+         # Verify the installation
+         sonar-scanner -v
+
 
       # Step 6: Run tests and generate coverage report
       - name: Run tests and generate coverage report
