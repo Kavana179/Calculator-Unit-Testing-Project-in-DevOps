@@ -36,13 +36,14 @@ jobs:
           coverage run -m pytest
           coverage xml
 
-      # Run SonarCloud analysis using the SonarCloud GitHub Action
-      - name: SonarCloud Scan
+      # Run SonarCloud analysis using the SonarCloud GitHub Action with debug enabled
+      - name: SonarCloud Scan with Debug Logging
         uses: SonarSource/sonarcloud-github-action@v1.5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
+            -X  # Enable full debug logging for SonarScanner
             -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
             -Dsonar.organization=kavana179
             -Dsonar.sources=.
