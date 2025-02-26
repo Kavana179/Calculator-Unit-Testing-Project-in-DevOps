@@ -35,13 +35,15 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y openjdk-17-jdk
 
-    - name: Verify Java Version
-      run: java -version  
+    - name: Set JAVA_HOME to OpenJDK 17
+      run: |
+        echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+        java -version  # Verify Java version in the environment
 
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
       with:
-        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  
+        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  # Default SonarScanner entry point in the Docker container
         args: >
           -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
           -Dsonar.organization=kavana179
@@ -49,5 +51,5 @@ jobs:
           -Dsonar.python.version=3.9
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.language=python
-          -Dsonar.host.url=https://sonarcloud.io  
-          -Dsonar.java.home=/usr/lib/jvm/java-17-openjdk-amd64  
+          -Dsonar.host.url=https://sonarcloud.io  # Set the SonarCloud URL
+          -Dsonar.java.home=$JAVA_HOME  # Use the JAVA_HOME environment variable
