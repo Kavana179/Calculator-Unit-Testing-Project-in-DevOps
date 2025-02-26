@@ -28,7 +28,7 @@ jobs:
 
     - name: Run tests and generate coverage report
       run: |
-        pytest --cov=calculator --cov-report=xml:coverage.xml  
+        pytest --cov=calculator --cov-report=xml:coverage.xml  # 'calculator' is your module
 
     - name: Install OpenJDK 17
       run: |
@@ -37,9 +37,9 @@ jobs:
 
     - name: Set JAVA_HOME to OpenJDK 17
       run: |
-        echo "JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64" >> $GITHUB_ENV
+        echo "JAVA_HOME=/opt/openjdk-17" >> $GITHUB_ENV
         echo "JAVA_HOME=$JAVA_HOME"
-        java -version 
+        java -version  # Verify Java version in the environment
 
     # Debug Java Home in Docker Container
     - name: Debug Java Home in Docker Container
@@ -57,8 +57,8 @@ jobs:
           -Dsonar.python.version=3.9
           -Dsonar.python.coverage.reportPaths=coverage.xml
           -Dsonar.language=python
-          -Dsonar.host.url=https://sonarcloud.io  
-          -Dsonar.java.home=$JAVA_HOME  
+          -Dsonar.host.url=https://sonarcloud.io  # Set the SonarCloud URL
+          -Dsonar.java.home=$JAVA_HOME  # Ensure JAVA_HOME is set for SonarCloud analysis
       env:
-        JAVA_HOME: ${{ env.JAVA_HOME }}  
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
+        JAVA_HOME: ${{ env.JAVA_HOME }}  # Explicitly pass JAVA_HOME into the SonarCloud container
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Ensure to set your SonarCloud token securely
