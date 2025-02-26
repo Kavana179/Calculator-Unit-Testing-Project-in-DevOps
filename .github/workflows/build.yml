@@ -13,71 +13,58 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code from GitHub
       - uses: actions/checkout@v4
 
-      # Step 2: Set Python environment variables
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV  # Add root directory to PYTHONPATH
-
-      # Step 3: Set up Python environment
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.9  # Use the correct Python version
-
-      # Step 4: Install dependencies
+      # Install necessary dependencies
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pytest
-          pip install coverage  # Install coverage for code coverage reports
+          sudo apt-get update
+          sudo apt-get install -y unzip wget openjdk-11-jdk jq  # Include jq for parsing
 
+      # Fetch and install SonarScanner
       - name: Install SonarScanner
         run: |
-         sudo apt-get update
-         sudo apt-get install -y unzip wget openjdk-11-jdk  # Install unzip, wget, and OpenJDK
+          # Fetch the latest SonarScanner release version
+          LATEST_VERSION=$(curl -s https://api.github.com/repos/SonarSource/sonar-scanner-cli/releases/latest | jq -r .tag_name)
 
-         # Fetch the latest SonarScanner release version
-         LATEST_VERSION=$(curl -s https://api.github.com/repos/SonarSource/sonar-scanner-cli/releases/latest | jq -r .tag_name)
+          # Debug: Print the fetched version
+          echo "SonarScanner version: $LATEST_VERSION"
 
-         # Download SonarScanner using the latest release version
-         wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/${LATEST_VERSION}/sonar-scanner-cli-${LATEST_VERSION}-linux.zip
+          # Download SonarScanner
+          wget https://github.com/SonarSource/sonar-scanner-cli/releases/download/${LATEST_VERSION}/sonar-scanner-cli-${LATEST_VERSION}-linux.zip
 
-         # Extract the downloaded file
-         unzip sonar-scanner-cli-${LATEST_VERSION}-linux.zip
+          # Unzip the downloaded file
+          unzip sonar-scanner-cli-${LATEST_VERSION}-linux.zip
 
-         # Move to a folder named sonar-scanner
-         mv sonar-scanner-cli-${LATEST_VERSION}-linux sonar-scanner
+          # Move the extracted folder
+          mv sonar-scanner-cli-${LATEST_VERSION}-linux sonar-scanner
 
-         # Set environment variables for SonarScanner
-         echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
-         echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
-         source $GITHUB_ENV
+          # Set environment variables for SonarScanner
+          echo "SONAR_SCANNER_HOME=$PWD/sonar-scanner" >> $GITHUB_ENV
+          echo "PATH=$PWD/sonar-scanner/bin:$PATH" >> $GITHUB_ENV
 
-         # Ensure SonarScanner is executable
-         chmod +x $PWD/sonar-scanner/bin/sonar-scanner
+          # Ensure SonarScanner is executable
+          chmod +x $PWD/sonar-scanner/bin/sonar-scanner
 
-         # Verify the installation
-         sonar-scanner -v
+          # Verify installation
+          sonar-scanner -v
 
-
-      # Step 6: Run tests and generate coverage report
+      # Run tests and generate coverage report
       - name: Run tests and generate coverage report
         run: |
-          pytest tests/ --maxfail=1 --disable-warnings -q  # Run tests in the 'tests' directory
+          pytest tests/
           coverage run -m pytest
-          coverage xml  # Generates coverage.xml file for SonarCloud
+          coverage xml
 
-      # Step 7: Run SonarCloud analysis
+      # Run SonarCloud analysis
       - name: Run SonarCloud analysis
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # Reference token from GitHub secrets
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner -X \
             -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
             -Dsonar.organization=kavana179 \
-            -Dsonar.sources=.  # Set source directory to the root of the repository
-            -Dsonar.language=python  # Set language to Python
-            -Dsonar.python.version=3.9  # Use the Python version 3.9
-            -Dsonar.python.coverage.reportPaths=coverage.xml  # Path to the generated coverage report
+            -Dsonar.sources=. \
+            -Dsonar.language=python \
+            -Dsonar.python.version=3.9 \
+            -Dsonar.python.coverage.reportPaths=coverage.xml
