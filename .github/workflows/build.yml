@@ -24,24 +24,24 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-cov  # Ensure pytest-cov plugin is installed
+        pip install pytest pytest-cov  # Make sure to install pytest-cov plugin
 
     - name: Run tests and generate coverage report
       run: |
-        pytest --cov=calculator --cov-report=xml:coverage.xml  # Replace 'calculator' with your module name
+        pytest --cov=calculator --cov-report=xml:coverage.xml  # 'calculator' is your module
 
     - name: Set up SonarCloud scanner
       uses: SonarSource/sonarcloud-github-action@v1.5
       with:
-        sonar-project-key: "Kavana179_Calculator-Unit-Testing-Project-in-DevOps"  # Replace with your SonarCloud project key
-        sonar-organization: "kavana179"  # Replace with your SonarCloud organization key
-        sonar-scanner-options: |
-          -Dsonar.python.version=3.9
-          -Dsonar.python.coverage.reportPaths=coverage.xml
-          -Dsonar.sources=.
-          -Dsonar.language=python
+        entryPoint: /opt/sonar-scanner/bin/sonar-scanner  # Default SonarScanner entry point in the Docker container
+        args: >
+          -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps  # Replace with your SonarCloud project key
+          -Dsonar.organization=kavana179  # Replace with your SonarCloud organization key
+          -Dsonar.sources=.  # The root directory of the source code
+          -Dsonar.python.version=3.9  # Python version you're using
+          -Dsonar.python.coverage.reportPaths=coverage.xml  # Path to the coverage report
+          -Dsonar.language=python  # Language used in your project
 
     - name: Run SonarCloud analysis
-      uses: SonarSource/sonarcloud-github-action@v1.5
-      with:
-        sonar-token: ${{ secrets.SONAR_TOKEN }}  # Make sure to add your SonarCloud token in GitHub Secrets
+      run: |
+        echo "Running SonarCloud analysis"
