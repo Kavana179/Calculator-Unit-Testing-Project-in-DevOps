@@ -17,50 +17,24 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Step 2: Set up Python (optional, if needed for coverage report)
+    # Step 2: Set up Python (choose the Python version you need)
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
+        python-version: '3.9'  # Set to the version of Python your project uses
 
-    # Step 3: Set up Java 17 (required for SonarScanner)
-    - name: Set up Java 17
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-
-    # Step 4: Verify Java configuration
-    - name: Verify Java configuration
-      run: |
-        echo "JAVA_HOME is $JAVA_HOME"
-        java -version
-
-    # Step 5: Install dependencies
+    # Step 3: Install required dependencies directly (no requirements.txt)
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-cov
+        pip install pytest pytest-cov  # Installing pytest and pytest-cov
 
-    # Step 6: Run tests and generate coverage report
+    # Step 4: Run tests and generate coverage report
     - name: Run tests and generate coverage report
       run: |
-        pytest --cov=calculator --cov-report=xml:coverage.xml
+        pytest --cov=calculator --cov-report=xml:coverage.xml  # Replace `your_project` with the actual project directory/module
 
-    # Step 7: Set JAVA_HOME to Java 17 for SonarScanner
-    - name: Set JAVA_HOME to Java 17 for SonarScanner
-      run: |
-        export JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
-        export PATH=$JAVA_HOME/bin:$PATH
-
-    # Step 8: Download and install SonarScanner
-    - name: Install SonarScanner
-      run: |
-        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip
-        unzip sonar-scanner.zip -d /opt
-        echo "/opt/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
-
-    # Step 9: Prepare sonar-project.properties
+    # Step 5: Prepare sonar-project.properties for SonarCloud analysis
     - name: Prepare sonar-project.properties
       run: |
         echo "sonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps" > sonar-project.properties
@@ -69,10 +43,16 @@ jobs:
         echo "sonar.python.version=3.9" >> sonar-project.properties
         echo "sonar.python.coverage.reportPaths=coverage.xml" >> sonar-project.properties
         echo "sonar.host.url=https://sonarcloud.io" >> sonar-project.properties
-        echo "sonar.login=${{ secrets.SONAR_TOKEN }}" >> sonar-project.properties
+        echo "sonar.login=${{ secrets.SONAR_TOKEN }}" >> sonar-project.properties  # Make sure to set SONAR_TOKEN in GitHub secrets
 
-    # Step 10: Run SonarScanner
+    # Step 6: Install SonarScanner (needed to analyze the project on SonarCloud)
+    - name: Install SonarScanner
+      run: |
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip
+        unzip sonar-scanner.zip -d /opt
+        echo "/opt/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
+
+    # Step 7: Run SonarScanner to analyze the project and send results to SonarCloud
     - name: Run SonarScanner
       run: |
         sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-
