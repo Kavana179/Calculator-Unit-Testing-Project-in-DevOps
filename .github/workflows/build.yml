@@ -49,6 +49,14 @@ jobs:
       run: |
         pytest --cov=calculator --cov-report=xml:coverage.xml
 
+     # Step 7: Install SonarScanner
+    - name: Install SonarScanner
+      run: |
+        wget -qO- https://dl.sonarsource.com/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip -O sonar-scanner.zip
+        unzip sonar-scanner.zip -d /opt
+        export PATH=$PATH:/opt/sonar-scanner-4.6.2.2472-linux/bin
+
+
     # Step 7: Run SonarCloud analysis using the SonarCloud GitHub Action
     - name: Run SonarCloud analysis
       uses: SonarSource/sonarcloud-github-action@v1.5
@@ -65,4 +73,4 @@ jobs:
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
-        PATH: $JAVA_HOME/bin:$PATH
+        PATH: /opt/sonar-scanner-4.6.2.2472-linux/bin:$PATH
