@@ -51,42 +51,27 @@ jobs:
 
     - name: Install SonarScanner
       run: |
-        # Download SonarScanner
-        wget -v https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip || exit 1
-        unzip sonar-scanner.zip -d /opt
-
-        # List contents of bin/ directory to verify
-        ls -l /opt/sonar-scanner-4.7.0.2747-linux/bin/
-
-        # Add SonarScanner to PATH explicitly
-        echo "Adding SonarScanner to PATH"
-        export PATH=$PATH:/opt/sonar-scanner-4.7.0.2747-linux/bin
+          # Download and unzip SonarScanner
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip
+          unzip sonar-scanner.zip -d /opt
+          # Add SonarScanner to PATH
+          export PATH=$PATH:/opt/sonar-scanner-4.7.0.2747-linux/bin
 
         
-    - name: Verify SonarScanner installation
+    # Step 6: Configure SonarCloud project properties
+    - name: Prepare sonar-project.properties
       run: |
-        # Verify if sonar-scanner is in PATH and check its version
-        echo "Checking sonar-scanner location"
-        which sonar-scanner
-        sonar-scanner --version
+          echo "sonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps" > sonar-project.properties
+          echo "sonar.organization=kavana179" >> sonar-project.properties
+          echo "sonar.sources=." >> sonar-project.properties
+          echo "sonar.python.version=3.9" >> sonar-project.properties
+          echo "sonar.python.coverage.reportPaths=coverage.xml" >> sonar-project.properties
+          echo "sonar.host.url=https://sonarcloud.io" >> sonar-project.properties
+          echo "sonar.login=${{ secrets.SONAR_TOKEN }}" >> sonar-project.properties
 
-    - name: Run SonarCloud Scan
+    - name: Run SonarScanner
       run: |
-        # Set JAVA_HOME explicitly
-        export JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
-
-        # Update PATH to include both JAVA_HOME and SonarScanner
-        export PATH=$JAVA_HOME/bin:$PATH:/opt/sonar-scanner-4.7.0.2747-linux/bin
-        sonar-scanner -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
-                      -Dsonar.organization=kavana179 \
-                      -Dsonar.sources=. \
-                      -Dsonar.python.version=3.9 \
-                      -Dsonar.python.coverage.reportPaths=coverage.xml \
-                      -Dsonar.language=python \
-                      -Dsonar.host.url=https://sonarcloud.io \
-                      -Dsonar.verbose=true
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
         
     # Step 7: Upload coverage report (Optional, depends on your setup)
     - name: Upload coverage to SonarCloud
