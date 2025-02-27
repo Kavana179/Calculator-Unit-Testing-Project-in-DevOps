@@ -10,7 +10,7 @@ on:
 
 jobs:
   sonarcloud:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Change this to 'windows-latest' if you want to run on Windows
 
     steps:
     # Step 1: Checkout the repository
@@ -23,7 +23,7 @@ jobs:
       with:
         python-version: '3.9'
 
-    # Step 3: Install dependencies (you don't have requirements.txt, so we install manually)
+    # Step 3: Install dependencies (e.g., pytest, pytest-cov)
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -34,25 +34,27 @@ jobs:
       run: |
         pytest --cov=your_project --cov-report=xml:coverage.xml  # Replace with your module name
 
-    # Step 5: Install Java 17 explicitly (Enforcing Java 17 setup)
-    - name: Install Java 17
+    # Step 5: Set up Java (using the pre-installed Java 17 from GitHub's action)
+    - name: Set up Java 17
       uses: actions/setup-java@v2
       with:
-        distribution: 'temurin'
-        java-version: '17'
+        distribution: 'temurin'  # Temurin is the OpenJDK distribution maintained by Adoptium
+        java-version: '17'       # Set Java 17 (or JDK 11 if needed)
 
-    # Step 6: Verify Java version (ensure Java 17 is used)
+    # Step 6: Verify Java version (ensure Java 17 is being used)
     - name: Verify Java configuration
       run: |
-        echo "JAVA_HOME is $JAVA_HOME"
-        java -version  # Verify that Java 17 is used
+        java -version  # Confirm Java 17 is used
 
-    # Step 7: Install SonarScanner version 4.6.2 (specific version)
-    - name: Install SonarScanner version 4.6.2
+    # Step 7: Download and install SonarScanner 6.2.1 for Windows (for windows-latest runner)
+    - name: Install SonarScanner 6.2.1.4610 for Windows
+      if: runner.os == 'Windows'
       run: |
-        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip -O sonar-scanner.zip
-        unzip sonar-scanner.zip -d /opt
-        echo "/opt/sonar-scanner-4.6.2.2472-linux/bin" >> $GITHUB_PATH
+        echo "Installing SonarScanner..."
+        Invoke-WebRequest -Uri "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-windows-x64.zip" -OutFile "sonar-scanner.zip"
+        Expand-Archive -Path "sonar-scanner.zip" -DestinationPath "$Env:ProgramFiles"
+        $env:PATH += ";$Env:ProgramFiles\sonar-scanner-6.2.1.4610-windows-x64\bin"
+        echo "SonarScanner has been installed successfully"
 
     # Step 8: Prepare sonar-project.properties for SonarCloud analysis
     - name: Prepare sonar-project.properties
@@ -69,3 +71,4 @@ jobs:
     - name: Run SonarScanner
       run: |
         sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }} -X
+
