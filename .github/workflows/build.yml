@@ -34,8 +34,8 @@ jobs:
       run: |
         pytest --cov=your_project --cov-report=xml:coverage.xml  # Replace with your module name
 
-    # Step 5: Install Java 17
-    - name: Set up Java 17
+    # Step 5: Install Java 17 explicitly (Enforcing Java 17 setup)
+    - name: Install Java 17
       uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
@@ -45,9 +45,9 @@ jobs:
     - name: Verify Java configuration
       run: |
         echo "JAVA_HOME is $JAVA_HOME"
-        java -version
+        java -version  # Verify that Java 17 is used
 
-    # Step 7: Install SonarScanner version 4.6.2 (specific version that should work better)
+    # Step 7: Install SonarScanner version 4.6.2 (specific version)
     - name: Install SonarScanner version 4.6.2
       run: |
         wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip -O sonar-scanner.zip
@@ -65,7 +65,7 @@ jobs:
         echo "sonar.host.url=https://sonarcloud.io" >> sonar-project.properties
         echo "sonar.login=${{ secrets.SONAR_TOKEN }}" >> sonar-project.properties
 
-    # Step 9: Run SonarScanner
+    # Step 9: Run SonarScanner with -X flag for full debug logs
     - name: Run SonarScanner
       run: |
-        sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }} -X
