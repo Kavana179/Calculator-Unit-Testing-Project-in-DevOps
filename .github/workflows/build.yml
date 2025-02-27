@@ -55,22 +55,27 @@ jobs:
         wget -v https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip || exit 1
         unzip sonar-scanner.zip -d /opt
 
-        # Check if sonar-scanner is in the correct location
-        ls /opt/sonar-scanner-4.7.0.2747-linux/bin/
+        # List contents of bin/ directory to verify
+        ls -l /opt/sonar-scanner-4.7.0.2747-linux/bin/
 
-        # Add SonarScanner to PATH
+        # Add SonarScanner to PATH explicitly
+        echo "Adding SonarScanner to PATH"
         export PATH=$PATH:/opt/sonar-scanner-4.7.0.2747-linux/bin
 
         
     - name: Verify SonarScanner installation
       run: |
-        # Verify if sonar-scanner is in PATH
+        # Verify if sonar-scanner is in PATH and check its version
+        echo "Checking sonar-scanner location"
         which sonar-scanner
         sonar-scanner --version
 
     - name: Run SonarCloud Scan
       run: |
+        # Set JAVA_HOME explicitly
         export JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
+
+        # Update PATH to include both JAVA_HOME and SonarScanner
         export PATH=$JAVA_HOME/bin:$PATH:/opt/sonar-scanner-4.7.0.2747-linux/bin
         sonar-scanner -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
                       -Dsonar.organization=kavana179 \
