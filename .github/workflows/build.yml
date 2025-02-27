@@ -49,47 +49,27 @@ jobs:
       run: |
         pytest --cov=calculator --cov-report=xml:coverage.xml
 
-    # Step 5: Install SonarScanner with debugging
+    # Step 5: Install SonarScanner
     - name: Install SonarScanner
       run: |
         # Use a more recent version URL with debugging
-        echo "Downloading SonarScanner..."
         wget -v https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip
-        if [ $? -ne 0 ]; then
-          echo "Failed to download SonarScanner. Exiting..."
-          exit 1
-        fi
-        
-        # Unzip the downloaded file
-        echo "Unzipping SonarScanner..."
         unzip sonar-scanner.zip -d /opt
-        if [ $? -ne 0 ]; then
-          echo "Failed to unzip SonarScanner. Exiting..."
-          exit 1
-        fi
-
-        # Add SonarScanner to the PATH
-        echo "Adding SonarScanner to PATH..."
         export PATH=$PATH:/opt/sonar-scanner-4.7.0.2747-linux/bin
 
-        # Verify installation
-        echo "Verifying SonarScanner installation..."
-        sonar-scanner --version
-
-
-    # Step 7: Run SonarCloud analysis using the SonarCloud GitHub Action
-    - name: Run SonarCloud analysis
-      uses: SonarSource/sonarcloud-github-action@v1.5
-      with:
-        args: |
-          -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps
-          -Dsonar.organization=kavana179
-          -Dsonar.sources=.
-          -Dsonar.python.version=3.9
-          -Dsonar.python.coverage.reportPaths=coverage.xml
-          -Dsonar.language=python
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.verbose=true
+    - name: Run SonarCloud Scan
+      run: |
+        # Explicitly set JAVA_HOME and ensure SonarScanner uses it
+        export JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
+        export PATH=$JAVA_HOME/bin:$PATH
+        sonar-scanner -Dsonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps \
+                      -Dsonar.organization=kavana179 \
+                      -Dsonar.sources=. \
+                      -Dsonar.python.version=3.9 \
+                      -Dsonar.python.coverage.reportPaths=coverage.xml \
+                      -Dsonar.language=python \
+                      -Dsonar.host.url=https://sonarcloud.io \
+                      -Dsonar.verbose=true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         
