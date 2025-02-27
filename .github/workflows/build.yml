@@ -10,20 +10,20 @@ on:
 
 jobs:
   sonarcloud:
-    runs-on: ubuntu-latest  # This can be changed to 'windows-latest' if you want to run on Windows
+    runs-on: ubuntu-latest
 
     steps:
     # Step 1: Checkout the repository
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Step 2: Set up Python (Choose the version you need)
+    # Step 2: Set up Python (optional, adjust based on your project requirements)
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.9'
 
-    # Step 3: Install dependencies (e.g., pytest, pytest-cov)
+    # Step 3: Install dependencies (for testing purposes)
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -32,28 +32,23 @@ jobs:
     # Step 4: Run tests and generate coverage report
     - name: Run tests and generate coverage report
       run: |
-        pytest --cov=your_project --cov-report=xml:coverage.xml  # Replace with your module name
+        pytest --cov=your_project --cov-report=xml:coverage.xml  # Replace 'your_project' with your module name
 
-    # Step 5: Set up Java 11 using 'actions/setup-java'
-    - name: Set up Java 11
+    # Step 5: Set up Java 11 (AdoptOpenJDK)
+    - name: Set up Java 11 (AdoptOpenJDK 11.0.14.1)
       uses: actions/setup-java@v2
       with:
-        distribution: 'temurin'  # Temurin is the OpenJDK distribution maintained by Adoptium
-        java-version: '11'       # Set Java 11
+        distribution: 'adoptopenjdk'
+        java-version: '11'
 
-    # Step 6: Verify Java version (ensure Java 11 is being used)
-    - name: Verify Java configuration
+    # Step 6: Ensure Java 11 is the default version
+    - name: Set Java 11 as default and verify
       run: |
-        java -version  # Confirm Java 11 is used
+        sudo update-alternatives --config java  # Ensures that Java 11 is selected
+        sudo update-alternatives --config javac  # Ensures that javac (compiler) is also Java 11
+        java -version  # Verifies that Java 11 is being used
 
-    # Step 7: Set JAVA_HOME to ensure SonarScanner uses Java 11
-    - name: Set JAVA_HOME to Java 11
-      run: |
-        echo "JAVA_HOME=/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/11.0.14-7/x64" >> $GITHUB_ENV
-        echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_PATH
-        java -version  # Verify that Java 11 is now used
-
-    # Step 8: Install SonarScanner
+    # Step 7: Install SonarScanner
     - name: Install SonarScanner
       run: |
         echo "Installing SonarScanner..."
@@ -62,7 +57,7 @@ jobs:
         echo "/opt/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
         echo "SonarScanner installation completed"
 
-    # Step 9: Prepare sonar-project.properties for SonarCloud analysis
+    # Step 8: Prepare sonar-project.properties for SonarCloud analysis
     - name: Prepare sonar-project.properties
       run: |
         echo "sonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps" > sonar-project.properties
@@ -73,7 +68,7 @@ jobs:
         echo "sonar.host.url=https://sonarcloud.io" >> sonar-project.properties
         echo "sonar.login=${{ secrets.SONAR_TOKEN }}" >> sonar-project.properties
 
-    # Step 10: Run SonarScanner with -X flag for full debug logs
+    # Step 9: Run SonarScanner with -X flag for full debug logs
     - name: Run SonarScanner
       run: |
         sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }} -X
