@@ -46,15 +46,14 @@ jobs:
       run: |
         java -version  # Confirm Java 17 is used
 
-    # Step 7: Download and install SonarScanner 6.2.1 for Windows (for windows-latest runner)
-    - name: Install SonarScanner 6.2.1.4610 for Windows
-      if: runner.os == 'Windows'
+    # Step 7: Install SonarScanner
+    - name: Install SonarScanner
       run: |
         echo "Installing SonarScanner..."
-        Invoke-WebRequest -Uri "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-windows-x64.zip" -OutFile "sonar-scanner.zip"
-        Expand-Archive -Path "sonar-scanner.zip" -DestinationPath "$Env:ProgramFiles"
-        $env:PATH += ";$Env:ProgramFiles\sonar-scanner-6.2.1.4610-windows-x64\bin"
-        echo "SonarScanner has been installed successfully"
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip
+        unzip sonar-scanner.zip -d /opt
+        echo "/opt/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
+        echo "SonarScanner installation completed"
 
     # Step 8: Prepare sonar-project.properties for SonarCloud analysis
     - name: Prepare sonar-project.properties
@@ -71,4 +70,3 @@ jobs:
     - name: Run SonarScanner
       run: |
         sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }} -X
-
