@@ -49,17 +49,25 @@ jobs:
       run: |
         pytest --cov=calculator --cov-report=xml:coverage.xml
 
-    # Step 5: Download and install SonarScanner
+
+    # Step 5: Install Java 17
+    - name: Install Java 17
+      run: |
+          sudo apt update
+          sudo apt install openjdk-17-jdk -y
+          sudo update-alternatives --config java
+          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
+          echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_PATH
+
+    # Step 6: Download and install SonarScanner
     - name: Install SonarScanner
       run: |
-          # Download and unzip SonarScanner
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip
           unzip sonar-scanner.zip -d /opt
-          # Add SonarScanner to PATH
           echo "/opt/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
 
         
-    # Step 6: Configure SonarCloud project properties
+    # Step 7: Prepare sonar-project.properties
     - name: Prepare sonar-project.properties
       run: |
           echo "sonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps" > sonar-project.properties
@@ -70,6 +78,7 @@ jobs:
           echo "sonar.host.url=https://sonarcloud.io" >> sonar-project.properties
           echo "sonar.login=${{ secrets.SONAR_TOKEN }}" >> sonar-project.properties
 
+    # Step 8: Run SonarScanner
     - name: Run SonarScanner
       run: |
           sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
