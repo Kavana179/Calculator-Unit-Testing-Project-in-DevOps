@@ -23,67 +23,54 @@ jobs:
       with:
         python-version: '3.9'
 
-    # Step 3: Set up Java (required for SonarScanner)
+    # Step 3: Install required dependencies (e.g., pytest and pytest-cov for coverage)
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov
+
+    # Step 4: Run tests and generate coverage report
+    - name: Run tests and generate coverage report
+      run: |
+        pytest --cov=calculator --cov-report=xml:coverage.xml
+
+    # Step 5: Set up Java 17 for SonarCloud analysis
     - name: Set up Java 17
       uses: actions/setup-java@v2
       with:
         distribution: 'temurin'
         java-version: '17'
 
-    # Step 4: Verify Java setup
+    # Step 6: Verify Java configuration
     - name: Verify Java configuration
       run: |
         echo "JAVA_HOME is $JAVA_HOME"
         java -version
 
-    # Step 5: Install required dependencies (e.g., if you need any packages for coverage or analysis)
-    # Add any necessary dependencies here for Python, coverage, etc.
-    # Example: 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest pytest-cov
-
-    # Step 6: Run tests and generate coverage report (adjust according to your project)
-    - name: Run tests and generate coverage report
-      run: |
-        pytest --cov=calculator --cov-report=xml:coverage.xml
-
-
-    # Step 5: Install Java 17
-    - name: Install Java 17
-      run: |
-          sudo apt update
-          sudo apt install openjdk-17-jdk -y
-          sudo update-alternatives --config java
-          echo "JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> $GITHUB_ENV
-          echo "PATH=$JAVA_HOME/bin:$PATH" >> $GITHUB_PATH
-
-    # Step 6: Download and install SonarScanner
+    # Step 7: Download and install SonarScanner
     - name: Install SonarScanner
       run: |
-          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip
-          unzip sonar-scanner.zip -d /opt
-          echo "/opt/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip -O sonar-scanner.zip
+        unzip sonar-scanner.zip -d /opt
+        echo "/opt/sonar-scanner-4.7.0.2747-linux/bin" >> $GITHUB_PATH
 
-        
-    # Step 7: Prepare sonar-project.properties
+    # Step 8: Prepare sonar-project.properties
     - name: Prepare sonar-project.properties
       run: |
-          echo "sonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps" > sonar-project.properties
-          echo "sonar.organization=kavana179" >> sonar-project.properties
-          echo "sonar.sources=." >> sonar-project.properties
-          echo "sonar.python.version=3.9" >> sonar-project.properties
-          echo "sonar.python.coverage.reportPaths=coverage.xml" >> sonar-project.properties
-          echo "sonar.host.url=https://sonarcloud.io" >> sonar-project.properties
-          echo "sonar.login=${{ secrets.SONAR_TOKEN }}" >> sonar-project.properties
+        echo "sonar.projectKey=Kavana179_Calculator-Unit-Testing-Project-in-DevOps" > sonar-project.properties
+        echo "sonar.organization=kavana179" >> sonar-project.properties
+        echo "sonar.sources=." >> sonar-project.properties
+        echo "sonar.python.version=3.9" >> sonar-project.properties
+        echo "sonar.python.coverage.reportPaths=coverage.xml" >> sonar-project.properties
+        echo "sonar.host.url=https://sonarcloud.io" >> sonar-project.properties
+        echo "sonar.login=${{ secrets.SONAR_TOKEN }}" >> sonar-project.properties
 
-    # Step 8: Run SonarScanner
+    # Step 9: Run SonarScanner
     - name: Run SonarScanner
       run: |
-          sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-        
-    # Step 7: Upload coverage report (Optional, depends on your setup)
+        sonar-scanner -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+    # Step 10: Upload coverage to SonarCloud (Optional, depends on your setup)
     - name: Upload coverage to SonarCloud
       if: success()
       run: |
