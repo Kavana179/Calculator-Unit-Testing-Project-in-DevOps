@@ -32,14 +32,17 @@ jobs:
     # Step 4: Run tests and generate coverage report
     - name: Run tests and generate coverage report
       run: |
-        pytest --cov=your_project --cov-report=xml:coverage.xml  # Replace 'your_project' with your module name
+        pytest --cov=calculator --cov-report=xml:coverage.xml  # Replace 'your_project' with your module name
 
-    # Step 5: Set up Java 11 (AdoptOpenJDK)
-    - name: Set up Java 11 (AdoptOpenJDK 11.0.14.1)
+    # Step 5: Set up Java 11 (Temurin)
+    - name: Set up Java 11 (Temurin)
       uses: actions/setup-java@v2
       with:
-        distribution: 'adoptopenjdk'
+        distribution: 'temurin'  # Corrected distribution name
         java-version: '11'
+        java-package: jdk
+        architecture: x64
+        check-latest: false
 
     # Step 6: Ensure Java 11 is the default version
     - name: Set Java 11 as default and verify
